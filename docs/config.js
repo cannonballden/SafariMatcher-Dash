@@ -8,7 +8,7 @@
 window.SAFARI_DASH_CONFIG = {
   // Example Worker URL:
   // "https://safarimatcher-dashboard-api.[YOUR_ACCOUNT].workers.dev"
-  API_BASE_URL: "[PASTE_YOUR_WORKER_URL_HERE]",
+  API_BASE_URL: "https://safarimatcher-dashboard-api.clarkbythebay.workers.dev/",
 
   BRAND: "SafariMatcher",
   DASHBOARD_TITLE: "SafariMatcher — Super Dashboard",
