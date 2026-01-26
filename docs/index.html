@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SafariMatcher — Super Dashboard</title>
+
+  <meta name="description" content="SafariMatcher unified analytics dashboard (Cloudflare + Google Search Console + optional GA4 + AI insights)." />
+
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <div class="bgGlow"></div>
+
+  <div class="app">
+    <header class="topbar">
+      <div class="brandBlock">
+        <div class="brandRow">
+          <div class="logoMark" aria-hidden="true">SM</div>
+          <div>
+            <div class="brand">SafariMatcher</div>
+            <div class="subtitle">Super Dashboard</div>
+          </div>
+        </div>
+
+        <div class="statusRow" id="statusRow">
+          <span class="chip" id="chipCf"><span class="dot"></span>Cloudflare</span>
+          <span class="chip" id="chipGsc"><span class="dot"></span>Search Console</span>
+          <span class="chip" id="chipGa4"><span class="dot"></span>GA4</span>
+          <span class="chip" id="chipAi"><span class="dot"></span>AI</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="field">
+          <label for="startDate">Start</label>
+          <input id="startDate" type="date" />
+        </div>
+        <div class="field">
+          <label for="endDate">End</label>
+          <input id="endDate" type="date" />
+        </div>
+
+        <label class="toggle">
+          <input id="compareToggle" type="checkbox" checked />
+          <span class="toggleUi" aria-hidden="true"></span>
+          <span class="toggleText">Compare</span>
+        </label>
+
+        <button class="btn" id="refreshBtn">Refresh</button>
+      </div>
+    </header>
+
+    <main class="grid">
+      <!-- KPIs -->
+      <section class="card span12">
+        <div class="cardHeader">
+          <h2>Overview</h2>
+          <div class="hint" id="rangeHint">—</div>
+        </div>
+
+        <div class="kpiGrid" id="kpiGrid">
+          <!-- filled by JS -->
+        </div>
+
+        <div class="microNote">
+          Heads up: Cloudflare “requests” are edge hits (bots + cache + everything). Search Console is Google Search only. GA4 is on-site sessions (if configured).
+        </div>
+      </section>
+
+      <!-- Alerts -->
+      <section class="card span6">
+        <div class="cardHeader">
+          <h2>Alerts</h2>
+          <div class="hint">Automatic “something changed” flags</div>
+        </div>
+        <div id="alertsBox" class="alertsBox">
+          <div class="empty">Refresh to generate alerts.</div>
+        </div>
+      </section>
+
+      <!-- AI Insights -->
+      <section class="card span6">
+        <div class="cardHeader">
+          <h2>AI Insights</h2>
+          <div class="hint">Summarize + prioritize next actions</div>
+        </div>
+
+        <div class="aiControls">
+          <button class="btn primary" id="aiBtn">Generate Insights</button>
+          <button class="btn" id="copyAiBtn" disabled>Copy</button>
+        </div>
+
+        <pre class="aiOut" id="aiOut">—</pre>
+      </section>
+
+      <!-- Trends -->
+      <section class="card span6">
+        <div class="cardHeader">
+          <h2>Search Trend</h2>
+          <div class="hint">Clicks + impressions (Search Console)</div>
+        </div>
+        <div class="chartWrap">
+          <canvas id="gscChart" height="130"></canvas>
+          <div class="chartOverlay" id="gscChartOverlay">Loading…</div>
+        </div>
+      </section>
+
+      <section class="card span6">
+        <div class="cardHeader">
+          <h2>Edge Trend</h2>
+          <div class="hint">Requests + cache hit % (Cloudflare)</div>
+        </div>
+        <div class="chartWrap">
+          <canvas id="cfChart" height="130"></canvas>
+          <div class="chartOverlay" id="cfChartOverlay">Loading…</div>
+        </div>
+      </section>
+
+      <section class="card span6">
+        <div class="cardHeader">
+          <h2>Top Queries</h2>
+          <div class="hint">Search Console</div>
+        </div>
+        <div class="tableWrap">
+          <table class="table" id="queriesTable">
+            <thead>
+              <tr>
+                <th>Query</th>
+                <th class="num">Clicks</th>
+                <th class="num">Impr.</th>
+                <th class="num">CTR</th>
+                <th class="num">Pos.</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div class="tableOverlay" id="queriesOverlay">Loading…</div>
+        </div>
+      </section>
+
+      <section class="card span6">
+        <div class="cardHeader">
+          <h2>Top Pages</h2>
+          <div class="hint">Search Console</div>
+        </div>
+        <div class="tableWrap">
+          <table class="table" id="pagesTable">
+            <thead>
+              <tr>
+                <th>Page</th>
+                <th class="num">Clicks</th>
+                <th class="num">Impr.</th>
+                <th class="num">CTR</th>
+                <th class="num">Pos.</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div class="tableOverlay" id="pagesOverlay">Loading…</div>
+        </div>
+      </section>
+
+      <section class="card span6">
+        <div class="cardHeader">
+          <h2>Search Devices</h2>
+          <div class="hint">Search Console</div>
+        </div>
+        <div class="tableWrap">
+          <table class="table" id="devicesTable">
+            <thead>
+              <tr>
+                <th>Device</th>
+                <th class="num">Clicks</th>
+                <th class="num">Impr.</th>
+                <th class="num">CTR</th>
+                <th class="num">Pos.</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div class="tableOverlay" id="devicesOverlay">Loading…</div>
+        </div>
+      </section>
+
+      <section class="card span6">
+        <div class="cardHeader">
+          <h2>Edge Countries</h2>
+          <div class="hint">Top request countries (Cloudflare)</div>
+        </div>
+        <div class="tableWrap">
+          <table class="table" id="countriesTable">
+            <thead>
+              <tr>
+                <th>Country</th>
+                <th class="num">Requests</th>
+                <th class="num">Bytes</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div class="tableOverlay" id="countriesOverlay">Loading…</div>
+        </div>
+      </section>
+
+      <!-- Business -->
+      <section class="card span12">
+        <div class="cardHeader">
+          <h2>Business Tracker</h2>
+          <div class="hint">Local-only (stored in this browser)</div>
+        </div>
+
+        <div class="bizGrid">
+          <div class="bizCard">
+            <h3>Quick Calculator</h3>
+            <div class="formGrid">
+              <div class="field">
+                <label for="bizRev">Revenue (period)</label>
+                <input id="bizRev" type="number" step="0.01" placeholder="e.g. 1200" />
+              </div>
+              <div class="field">
+                <label for="bizCost">Costs (period)</label>
+                <input id="bizCost" type="number" step="0.01" placeholder="e.g. 450" />
+              </div>
+              <div class="field">
+                <label for="bizAds">Ad spend (period)</label>
+                <input id="bizAds" type="number" step="0.01" placeholder="e.g. 200" />
+              </div>
+              <div class="field">
+                <label for="bizLabel">Label</label>
+                <input id="bizLabel" type="text" placeholder="e.g. Jan week 3" />
+              </div>
+
+              <button class="btn" id="bizCalcBtn">Calculate</button>
+              <button class="btn primary" id="bizAddBtn">Add to Ledger</button>
+              <button class="btn danger" id="bizResetBtn">Reset Ledger</button>
+            </div>
+
+            <div class="pillRow">
+              <div class="pill">Profit: <span id="bizProfitOut">—</span></div>
+              <div class="pill">Cumulative Profit: <span id="bizCumOut">—</span></div>
+              <div class="pill">Profit Margin: <span id="bizMarginOut">—</span></div>
+            </div>
+
+            <div class="microNote">
+              Pro tip: if you add entries consistently (weekly or monthly), the dashboard can spot “business vs traffic” mismatches.
+            </div>
+          </div>
+
+          <div class="bizCard">
+            <h3>Ledger</h3>
+            <div class="tableWrap">
+              <table class="table" id="ledgerTable">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Label</th>
+                    <th class="num">Revenue</th>
+                    <th class="num">Costs</th>
+                    <th class="num">Ads</th>
+                    <th class="num">Profit</th>
+                    <th class="num">Cum.</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+              <div class="tableOverlay hide" id="ledgerOverlay">No entries yet.</div>
+            </div>
+
+            <div class="microActions">
+              <button class="btn" id="exportLedgerBtn">Export JSON</button>
+              <button class="btn" id="importLedgerBtn">Import JSON</button>
+              <input id="importLedgerFile" type="file" accept="application/json" hidden />
+            </div>
+
+            <div class="microNote">
+              Ledger is localStorage-based. If you switch browsers/computers, export + import to move it.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings -->
+      <section class="card span12">
+        <div class="cardHeader">
+          <h2>Settings / Connection Test</h2>
+          <div class="hint">This page is static — API secrets live in the Worker, not here.</div>
+        </div>
+
+        <div class="settingsGrid">
+          <div class="settingsCard">
+            <h3>API Base URL</h3>
+            <div class="mono" id="apiBaseOut">—</div>
+            <div class="microNote">
+              Edit <code>docs/config.js</code> and set <code>API_BASE_URL</code> to your Worker URL.
+            </div>
+          </div>
+
+          <div class="settingsCard">
+            <h3>Health Check</h3>
+            <button class="btn" id="healthBtn">Run health check</button>
+            <pre class="code" id="healthOut">—</pre>
+          </div>
+
+          <div class="settingsCard">
+            <h3>GoDaddy / SEMrush</h3>
+            <div class="microNote">
+              GoDaddy doesn’t provide a public “site traffic analytics” API like Google/Cloudflare.
+              SEMrush’s API is usually a paid add-on. This dashboard focuses on: <b>Search Console + Cloudflare</b> (and optionally GA4).
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="tiny">
+        Built for SafariMatcher. Data is cached at the edge for a few minutes to avoid rate limits.
+      </div>
+    </footer>
+  </div>
+
+  <div class="toastStack" id="toastStack" aria-live="polite" aria-atomic="true"></div>
+
+  <script defer src="./config.js"></script>
+  <script defer src="./app.js"></script>
+</body>
+</html>

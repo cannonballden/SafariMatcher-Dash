@@ -1,0 +1,21 @@
+# Cloudflare Worker configuration for SafariMatcher Super Dashboard API
+# Docs: https://developers.cloudflare.com/workers/wrangler/configuration/
+
+name = "[YOUR_WORKER_NAME]"            # e.g. "safarimatcher-dashboard-api"
+main = "src/index.js"
+compatibility_date = "2026-01-01"
+workers_dev = true
+
+# Bind Workers AI so env.AI.run() works.
+# Docs: https://developers.cloudflare.com/workers-ai/configuration/bindings/
+[ai]
+binding = "AI"
+
+# Non-secret runtime variables.
+# Put secrets like CF_API_TOKEN & GOOGLE_SERVICE_ACCOUNT_JSON in Wrangler Secrets (NOT here).
+[vars]
+CORS_ORIGIN = "*"  # Recommended to lock down later to your dashboard URL
+CF_ZONE_ID = "[YOUR_CLOUDFLARE_ZONE_ID]"
+GSC_SITE_URL = "[sc-domain:safarimatcher.com OR https://safarimatcher.com/]"   # must match your Search Console property
+GA4_PROPERTY_ID = ""  # optional (leave blank if you aren't using GA4 yet)
+AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast"
