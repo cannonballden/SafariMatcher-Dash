@@ -332,9 +332,7 @@
       apiPost("/api/cloudflare/daily", { startDate, endDate }).then((d) => ({ key: "cfDaily", ok: true, data: d })).catch((e) => ({ key: "cfDaily", ok: false, err: e })),
       apiPost("/api/cloudflare/countries", { startDate, endDate, limit: 12 }).then((d) => ({ key: "cfCountries", ok: true, data: d })).catch((e) => ({ key: "cfCountries", ok: false, err: e })),
 
-      // GA4 optional
-      apiPost("/api/ga4/summary", { startDate, endDate }).then((d) => ({ key: "ga4Summary", ok: true, data: d })).catch((e) => ({ key: "ga4Summary", ok: false, err: e })),
-    ];
+    
 
     if (prev) {
       reqs.push(
