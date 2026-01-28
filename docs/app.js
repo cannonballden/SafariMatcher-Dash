@@ -50,7 +50,7 @@
   }
 
   function fmtBytes(bytes) {
-    if (!Number.isFinite(bytes)) return "—";
+  if (!Number.isFinite(bytes)) return "—";
     const units = ["B", "KB", "MB", "GB", "TB"];
     let b = bytes;
     let i = 0;
@@ -331,10 +331,9 @@
       // Cloudflare
       apiPost("/api/cloudflare/daily", { startDate, endDate }).then((d) => ({ key: "cfDaily", ok: true, data: d })).catch((e) => ({ key: "cfDaily", ok: false, err: e })),
       apiPost("/api/cloudflare/countries", { startDate, endDate, limit: 12 }).then((d) => ({ key: "cfCountries", ok: true, data: d })).catch((e) => ({ key: "cfCountries", ok: false, err: e })),
+];
 
-    
-
-    if (prev) {
+      if (prev) {
       reqs.push(
         apiPost("/api/gsc/summary", prev).then((d) => ({ key: "gscSummaryPrev", ok: true, data: d })).catch((e) => ({ key: "gscSummaryPrev", ok: false, err: e })),
         apiPost("/api/cloudflare/daily", prev).then((d) => ({ key: "cfDailyPrev", ok: true, data: d })).catch((e) => ({ key: "cfDailyPrev", ok: false, err: e })),
