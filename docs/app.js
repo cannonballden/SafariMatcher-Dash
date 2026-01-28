@@ -1,7 +1,7 @@
 /* global Chart */
 
 (() => {
-  const cfg = window.SAFARI_DASH_CONFIG || {};
+  const cfg = window.CONFIG || window.SAFARI_DASH_CONFIG || {};
   const API_BASE_URL_RAW = (cfg.API_BASE_URL || "").trim();
   const API_BASE_URL = API_BASE_URL_RAW.replace(/\/$/, "");
   const PATH_PREFIX = (cfg.PATH_PREFIX || "").replace(/\/$/, "");
