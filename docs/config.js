@@ -5,7 +5,7 @@
  * - This file must NOT contain secrets.
  * - It only points the frontend at your backend Worker.
  */
-window.SAFARI_DASH_CONFIG = {
+window.CONFIG = {
   // Example Worker URL:
   // "https://safarimatcher-dashboard-api.[YOUR_ACCOUNT].workers.dev"
   API_BASE_URL: "https://safarimatcher-dashboard-api.clarkbythebay.workers.dev",
