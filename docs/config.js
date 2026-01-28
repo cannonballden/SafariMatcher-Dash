@@ -8,7 +8,7 @@
 window.CONFIG = {
   // Example Worker URL:
   // "https://safarimatcher-dashboard-api.[YOUR_ACCOUNT].workers.dev"
-  API_BASE_URL: "https://safarimatcher-dashboard-api.clarkbythebay.workers.dev",
+  API_BASE_URL: "https://safarimatcher-dashboard-api.clarkbythebay.workers.dev"
 
   BRAND: "SafariMatcher",
   DASHBOARD_TITLE: "SafariMatcher — Super Dashboard",
